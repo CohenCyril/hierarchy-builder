@@ -42,17 +42,16 @@
       interval.job = false;
     };
   in {
-    "rocq-master" = { rocqPackages = mcHBcommon // {
-      rocq-core.override.version = "master";
-      stdlib.override.version = "master";
-      rocq-elpi.override.version = "master";
-      micromega-plugin.override.version = "master";
-      bignums.override.version = "master";
-    }; coqPackages = coqMcHBcommon // {
-      coq.override.version = "master";
-      stdlib.override.version = "master";
-      coq-elpi.override.version = "master";
-      bignums.override.version = "master";
+    "universes-and-variances" = { rocqPackages = {
+      rocq-core.override.version = "mattam82:universes-and-variances";
+      stdlib.override.version = "mattam82:universes-and-variances";
+      rocq-elpi.override.version = "mattam82:universes-and-variances";
+      bignums.override.version = "mattam82:universes-and-variances";
+    }; coqPackages = mcHBcommon // {
+      coq.override.version = "mattam82:universes-and-variances";
+      stdlib.override.version = "mattam82:universes-and-variances";
+      coq-elpi.override.version = "mattam82:universes-and-variances";
+      bignums.override.version = "mattam82:universes-and-variances";
       coquelicot.job = false;
     }; };
 
