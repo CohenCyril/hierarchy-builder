@@ -1,8 +1,8 @@
 {
   format = "1.0.0";
   attribute = "hierarchy-builder";
-  no-rocq-yet = true;
-  default-bundle = "coq-universes-clauses";
+  # no-rocq-yet = true;
+  default-bundle = "universes-and-variances";
   bundles = let
     mcHBcommon = {
       mathcomp.override.version = "master";
