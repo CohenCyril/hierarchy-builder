@@ -582,13 +582,14 @@ Lemma delta_functor {C D : cat} : PreFunctor_IsFunctor _ _ (delta C D).
 Proof. by constructor=> [a|a b c f g]; exact/natP. Qed.
 HB.instance Definition _ C D := @delta_functor C D.
 
+#[verbose]
 HB.mixin Record IsMonad (C : precat) (M : C -> C) & @PreFunctor C C M := {
   unit : idfun ~~> M;
   join : (M \o M)%function ~~> M;
   bind : forall (a b : C), (a ~> M b) -> (M a ~> M b);
   bindE : forall a b (f : a ~> M b), bind a b f = M <$> f \; join _ ;
   unit_join : forall a, (M <$> unit a) \; join _ = idmap;
-  join_unit : forall a, join _ \; (M <$> unit a) = idmap;
+  join_unit : forall a, join a \; (M <$> unit a) = idmap;
   join_square : forall a, M <$> join a \; join _ = join _ \; join _
 }.
 
@@ -617,6 +618,7 @@ HB.mixin Record IsCoMonad (C : precat) (M : C -> C) & @IsPreFunctor C C M := {
   cobind : forall (a b : C), (M a ~> b) -> (M a ~> M b);
   cobindE : forall a b (f : M a ~> b), cobind a b f = cojoin _ \; M <$> f;
   unit_cojoin : forall a, (M <$> counit a) \; cojoin _ = idmap;
+
   join_counit : forall a, cojoin _ \; (M <$> counit a) = idmap;
   cojoin_square : forall a, cojoin _ \; M <$> cojoin a = cojoin _ \; cojoin _
 }.
