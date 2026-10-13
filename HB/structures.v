@@ -666,7 +666,7 @@ main [const-decl N (some B) Arity] :- !, std.do! [
   % compute the universe for the structure (default )
   prod-last {coq.arity->term Arity} Ty,
   if (ground_term Ty) (Sort = Ty) (Sort = {{Type}}), sort Univ = Sort,
-  with-attributes (with-logging (structure.declare N B Univ)),
+  @primitive! => with-attributes (with-logging (structure.declare N B Univ)),
 ].
 main [upoly-const-decl N (some B) Arity _] :- main [const-decl N (some B) Arity].
 
