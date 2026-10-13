@@ -24,11 +24,11 @@ Axiom Prop_irrelevance : forall (P : Prop) (x y : P), x = y.
 Notation U := Type.
 
 (* Base definition : raw categories = quivers *)
-HB.mixin Record IsQuiver C := { hom : C -> C -> U }.
+HB.mixin Record IsQuiver@{obj hom} (C : Type@{obj}) := { hom : C -> C -> Type@{hom} }.
 
 #[short(type="quiver")]
 HB.structure Definition Quiver := { C of IsQuiver C }.
-
+Set Printing Universes.
 Bind Scope cat_scope with quiver.
 Bind Scope cat_scope with hom.
 Arguments hom {C} : rename.
@@ -112,12 +112,15 @@ Lemma U1x (X : U) x : \idmap_X x = x.
 Proof. by []. Qed.
 
 (* a prefunctor is a functor without laws *)
-HB.mixin Record IsPreFunctor (C D : quiver) (F : C -> D) := {
+HB.mixin Record IsPreFunctor@{cobj dobj chom dhom}
+    (C : quiver@{cobj chom}) (D : quiver@{dobj dhom}) (F : C -> D) := {
    Fhom : forall (a b : C), (a ~> b) -> (F a ~> F b)
 }.
 
 HB.structure Definition PreFunctor (C D : quiver) :=
   { F of IsPreFunctor C D F }.
+Set Printing Universes.
+Print PreFunctor.type.
 
 HB.instance Definition _ := IsQuiver.Build quiver PreFunctor.type.
 
@@ -401,7 +404,7 @@ End cat_prod.
 HB.instance Definition _  (C : U) (D : quiver) :=
   IsQuiver.Build (C -> D) (fun f g => forall c, f c ~> g c).
 
-HB.mixin Record IsNatural (C : quiver) (D : precat) (F G : @hom Quiver_type__canonical__cat_Quiver C D)
+HB.mixin Record IsNatural (C : quiver) (D : precat) (F G : C ~>_quiver D)
      (n : forall c, F c ~> G c) : Prop := { 
    natural : forall (a b : C) (f : a ~> b),
      F <$> f \; n b = n a \; G <$> f
@@ -436,12 +439,8 @@ Definition Uq : concrete_precat := U.
 
 About precat.
 About cat_PreCat__to__cat_Quiver.
-Lemma naturalU (C : precat) (F G : C ~>_quiver Uq) 
-  (n : @hom
-(PreFunctor_type__canonical__cat_Quiver (cat_PreCat__to__cat_Quiver C)
-(cat_ConcretePreCat__to__cat_PreCat U)) F G)
-
-(* (n : F ~> G) *)
+Set Printing Universes.
+Lemma naturalU@{u v} (C : precat@{u v}) (F G : C ~>_quiver@{u v} Uq) (n : F ~>_(PreFunctor.type _ _ : quiver) G)
    (a b : C) (f : a ~> b) g :  n b (F^$ f g) = G^$ f (n a g).
 Proof. exact: (naturalx n). Qed.
 
@@ -665,7 +664,7 @@ HB.instance Definition _ := homFhom_natural_subdef.
 End nat.
 Arguments homFhom / : clear implicits.
 
-Check homFhom : forall x y : C, (x ~> y) -> (homF x -> homF y).
+Check homFhom : forall x y : C, (x ~> y) -> (homF x ~> homF y).
 
 HB.instance Definition _ := IsPreFunctor.Build _ _ homF homFhom.
 Lemma homF_functor_subproof : PreFunctor_IsFunctor _ _ homF.
@@ -701,22 +700,22 @@ move=> f; apply/natP; apply/funext => a; apply/funext => g /=.
 by rewrite -naturalU/=; congr (f _ _); apply: comp1o.
 Qed.
 
-Lemma repr_homK : cancel (repr_hom : F c ~>_(Type@{u+1}) homF c) hom_repr.
+Lemma repr_homK : cancel repr_hom_nat hom_repr.
 Proof. by move=> fc; rewrite /= F1. Qed.
 End pointed.
 Arguments hom_repr /.
 Arguments repr_hom /.
 About IsNatural.axioms_.
  
-(*Lemma hom_repr_natural_subproof : IsNatural C cat@{u+1 u} _ _ hom_repr.
+Lemma hom_repr_natural_subproof : IsNatural C cat@{u+1 u} _ _ hom_repr.
 Proof.
 split=> a b f /=; apply/funext => n /=; rewrite !Ucompx/= compo1/=.
 by rewrite -naturalU/=; congr (n _ _); apply/esym/comp1o.
 Qed.
-HB.instance Definition _ := hom_repr_natural_subproof. *)
+HB.instance Definition _ := hom_repr_natural_subproof.
 
-(* show this from the previous proof *)
-(*Lemma hom_natural_repr_subproof : IsNatural _ _ _ _ repr_hom_nat.
+show this from the previous proof
+Lemma hom_natural_repr_subproof : IsNatural _ _ _ _ repr_hom_nat.
 Proof.
 split=> a b f /=; apply: funext => fa /=; rewrite !Ucompx/=.
 apply: natP; apply: funext => c /=; apply: funext => d /=.
@@ -725,7 +724,7 @@ Qed.
 HB.instance Definition _ := hom_natural_repr_subproof.
 
 Definition hom_repr_nat : homF ~~> F := hom_repr.
-Definition repr_hom_nat_nat : F ~~> homF := repr_hom_nat. *)
+Definition repr_hom_nat_nat : F ~~> homF := repr_hom_nat.
 
 End hom_repr.
 
